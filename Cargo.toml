@@ -1,0 +1,13 @@
+[workspace]
+members = ["crates/core", "crates/cli"]
+resolver = "2"
+
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
+license = "MIT"
+authors = ["LucaDeltort"]
+repository = "https://github.com/LucaDeltort/locus"
+description = "A fast, open-source tool for managing iOS/macOS localization files"
+keywords = ["ios", "macos", "localization", "strings", "xcstrings"]
+categories = ["command-line-utilities", "development-tools"]
