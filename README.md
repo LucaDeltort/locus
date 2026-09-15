@@ -34,7 +34,7 @@ for a more visual experience.
 ### Homebrew (recommended)
 
 ```bash
-brew install luca/tap/locus
+brew install LucaDeltort/tap/locus
 ```
 
 ### Cargo
@@ -46,7 +46,7 @@ cargo install locus-cli
 ### From source
 
 ```bash
-git clone https://github.com/luca/locus.git
+git clone https://github.com/LucaDeltort/locus.git
 cd locus
 cargo build --release
 # Binary is at target/release/locus
