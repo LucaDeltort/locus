@@ -1,0 +1,10 @@
+[package]
+name = "locus-bindgen"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+uniffi_bindgen = "0.29"
+camino = "1"

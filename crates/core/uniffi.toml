@@ -1,0 +1,2 @@
+[bindings.swift]
+output_dir = "generated/swift"
