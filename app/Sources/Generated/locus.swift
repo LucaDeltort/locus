@@ -480,6 +480,11 @@ public protocol LocusProjectProtocol: AnyObject, Sendable {
     func addKey(file: String, key: String, baseLang: String, baseValue: String) throws 
     
     /**
+     * Delete a key from all locales of a file.
+     */
+    func deleteKey(file: String, key: String) throws 
+    
+    /**
      * All logical files, sorted alphabetically.
      */
     func files()  -> [FileInfo]
@@ -590,6 +595,17 @@ open func addKey(file: String, key: String, baseLang: String, baseValue: String)
         FfiConverterString.lower(key),
         FfiConverterString.lower(baseLang),
         FfiConverterString.lower(baseValue),$0
+    )
+}
+}
+    
+    /**
+     * Delete a key from all locales of a file.
+     */
+open func deleteKey(file: String, key: String)throws   {try rustCallWithError(FfiConverterTypeLocusError_lift) {
+    uniffi_locus_core_fn_method_locusproject_delete_key(self.uniffiClonePointer(),
+        FfiConverterString.lower(file),
+        FfiConverterString.lower(key),$0
     )
 }
 }
@@ -1039,6 +1055,11 @@ public enum LocusError: Swift.Error {
     case KeyAlreadyExists(key: String
     )
     /**
+     * A key was not found when trying to delete it.
+     */
+    case KeyNotFound(key: String
+    )
+    /**
      * An IO error occurred during scanning or saving.
      */
     case Io(message: String
@@ -1073,10 +1094,13 @@ public struct FfiConverterTypeLocusError: FfiConverterRustBuffer {
         case 3: return .KeyAlreadyExists(
             key: try FfiConverterString.read(from: &buf)
             )
-        case 4: return .Io(
+        case 4: return .KeyNotFound(
+            key: try FfiConverterString.read(from: &buf)
+            )
+        case 5: return .Io(
             message: try FfiConverterString.read(from: &buf)
             )
-        case 5: return .Parse(
+        case 6: return .Parse(
             message: try FfiConverterString.read(from: &buf)
             )
 
@@ -1106,13 +1130,18 @@ public struct FfiConverterTypeLocusError: FfiConverterRustBuffer {
             FfiConverterString.write(key, into: &buf)
             
         
-        case let .Io(message):
+        case let .KeyNotFound(key):
             writeInt(&buf, Int32(4))
+            FfiConverterString.write(key, into: &buf)
+            
+        
+        case let .Io(message):
+            writeInt(&buf, Int32(5))
             FfiConverterString.write(message, into: &buf)
             
         
         case let .Parse(message):
-            writeInt(&buf, Int32(5))
+            writeInt(&buf, Int32(6))
             FfiConverterString.write(message, into: &buf)
             
         }
@@ -1328,6 +1357,9 @@ private let initializationResult: InitializationResult = {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_locus_core_checksum_method_locusproject_add_key() != 49019) {
+        return InitializationResult.apiChecksumMismatch
+    }
+    if (uniffi_locus_core_checksum_method_locusproject_delete_key() != 14682) {
         return InitializationResult.apiChecksumMismatch
     }
     if (uniffi_locus_core_checksum_method_locusproject_files() != 34101) {

@@ -42,7 +42,7 @@ pub fn add_key(
         key.to_string(),
         Key {
             key: key.to_string(),
-            value: Some(base_value.to_string()),
+            value: if base_value.is_empty() { None } else { Some(base_value.to_string()) },
             comment: None,
             state: crate::model::KeyState::Translated,
             extraction_state: None,
@@ -81,7 +81,8 @@ pub fn set_value(
         key.to_string(),
         Key {
             key: key.to_string(),
-            value: Some(value.to_string()),
+            // Empty string = no value (treated as missing by the UI).
+            value: if value.is_empty() { None } else { Some(value.to_string()) },
             comment: None,
             state: crate::model::KeyState::Translated,
             extraction_state: None,
@@ -91,10 +92,34 @@ pub fn set_value(
     Ok(())
 }
 
+/// Remove a key from all locales of a file.
+///
+/// Returns `KeyNotFound` if the key doesn't exist in any locale.
+pub fn delete_key(project: &mut Project, file: &str, key: &str) -> Result<(), EditError> {
+    let localization_file = project
+        .files
+        .get_mut(file)
+        .ok_or_else(|| EditError::FileNotFound(file.to_string()))?;
+
+    let mut removed = false;
+    for sf in localization_file.locales.values_mut() {
+        if sf.keys.shift_remove(key).is_some() {
+            removed = true;
+        }
+    }
+
+    if !removed {
+        return Err(EditError::KeyNotFound(key.to_string()));
+    }
+
+    Ok(())
+}
+
 #[derive(Debug)]
 pub enum EditError {
     FileNotFound(String),
     KeyAlreadyExists(String),
+    KeyNotFound(String),
 }
 
 // --- Tests ---

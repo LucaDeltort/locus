@@ -7,13 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		08B7523DB63B23ACEC927360 /* LocaleFilterPopover.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA422DCC9B0B895B4A7124DD /* LocaleFilterPopover.swift */; };
+		0B979F6DEDC5619B5B55D7E3 /* AddKeySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FA7B69A52EF3EB1DD4691B6 /* AddKeySheet.swift */; };
 		1127187D27176EE43ADA3036 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D8851E1E55996E966F9B896 /* ContentView.swift */; };
-		3C750A11BD0035ABA2B1DDDA /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17117E969B639FD9A8A692D7 /* Extensions.swift */; };
 		5F91037F71B9013AE51CFC2D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 160A96D47C943C727D23A73B /* Assets.xcassets */; };
 		61A4EAA19880ACE99CFE0742 /* KeyListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 827EE15E106FFFC6B44E96DF /* KeyListView.swift */; };
 		6392A75DA8F6E984C81F9A74 /* ProjectViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A822DFFA4C757152A2770E4 /* ProjectViewModel.swift */; };
 		6E73BC4F13EBFC4E61EF8A21 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97DC94061D3F472B4B2FF7EE /* Theme.swift */; };
-		AB91A59A5C4AA3FA1998BAFA /* FileSidebar.swift in Sources */ = {isa = PBXBuildFile; fileRef = E38872F49FCEAC26FF8345A4 /* FileSidebar.swift */; };
 		C523F8C8C416F34C89FBE2E2 /* ProjectPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11EDD716D8FFE27CCC5D11AB /* ProjectPersistence.swift */; };
 		C5BC20E9E4A08EC533D1D9E5 /* KeyDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3BA21464DD5CDA5AF1A3CE9 /* KeyDetailView.swift */; };
 		D57D11271309BAA33CF8E7C0 /* LocusApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF43B578D4334D4075F2C8A1 /* LocusApp.swift */; };
@@ -22,9 +22,10 @@
 
 /* Begin PBXFileReference section */
 		08718EC090E0C1D254560A32 /* locus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = locus.swift; sourceTree = "<group>"; };
+		0E6B0238BB86CA2FDFD1FDAF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		11EDD716D8FFE27CCC5D11AB /* ProjectPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectPersistence.swift; sourceTree = "<group>"; };
 		160A96D47C943C727D23A73B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		17117E969B639FD9A8A692D7 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		3FA7B69A52EF3EB1DD4691B6 /* AddKeySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddKeySheet.swift; sourceTree = "<group>"; };
 		827EE15E106FFFC6B44E96DF /* KeyListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyListView.swift; sourceTree = "<group>"; };
 		8A822DFFA4C757152A2770E4 /* ProjectViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectViewModel.swift; sourceTree = "<group>"; };
 		8D8851E1E55996E966F9B896 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -32,7 +33,7 @@
 		AEFB9A10F8784355D5344D95 /* Locus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Locus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CF43B578D4334D4075F2C8A1 /* LocusApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocusApp.swift; sourceTree = "<group>"; };
 		D3BA21464DD5CDA5AF1A3CE9 /* KeyDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyDetailView.swift; sourceTree = "<group>"; };
-		E38872F49FCEAC26FF8345A4 /* FileSidebar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSidebar.swift; sourceTree = "<group>"; };
+		EA422DCC9B0B895B4A7124DD /* LocaleFilterPopover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocaleFilterPopover.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -56,10 +57,11 @@
 		87E8E738F84C69532D05081F /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				3FA7B69A52EF3EB1DD4691B6 /* AddKeySheet.swift */,
 				8D8851E1E55996E966F9B896 /* ContentView.swift */,
-				E38872F49FCEAC26FF8345A4 /* FileSidebar.swift */,
 				D3BA21464DD5CDA5AF1A3CE9 /* KeyDetailView.swift */,
 				827EE15E106FFFC6B44E96DF /* KeyListView.swift */,
+				EA422DCC9B0B895B4A7124DD /* LocaleFilterPopover.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -67,7 +69,6 @@
 		A7C01A66F4E8F23618937C7E /* Theme */ = {
 			isa = PBXGroup;
 			children = (
-				17117E969B639FD9A8A692D7 /* Extensions.swift */,
 				97DC94061D3F472B4B2FF7EE /* Theme.swift */,
 			);
 			path = Theme;
@@ -113,6 +114,7 @@
 		F98C3CF022A3513E77A0E855 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				0E6B0238BB86CA2FDFD1FDAF /* Info.plist */,
 				CF43B578D4334D4075F2C8A1 /* LocusApp.swift */,
 			);
 			path = App;
@@ -192,6 +194,14 @@
 			inputPaths = (
 				"$(SRCROOT)/../crates/core/src/lib.rs",
 				"$(SRCROOT)/../crates/core/src/ffi.rs",
+				"$(SRCROOT)/../crates/core/src/edit.rs",
+				"$(SRCROOT)/../crates/core/src/model.rs",
+				"$(SRCROOT)/../crates/core/src/parser.rs",
+				"$(SRCROOT)/../crates/core/src/xcstrings.rs",
+				"$(SRCROOT)/../crates/core/src/project.rs",
+				"$(SRCROOT)/../crates/core/src/search.rs",
+				"$(SRCROOT)/../crates/core/src/missing.rs",
+				"$(SRCROOT)/../crates/core/src/save.rs",
 				"$(SRCROOT)/../Cargo.toml",
 			);
 			name = "Build Rust Core";
@@ -214,11 +224,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0B979F6DEDC5619B5B55D7E3 /* AddKeySheet.swift in Sources */,
 				1127187D27176EE43ADA3036 /* ContentView.swift in Sources */,
-				3C750A11BD0035ABA2B1DDDA /* Extensions.swift in Sources */,
-				AB91A59A5C4AA3FA1998BAFA /* FileSidebar.swift in Sources */,
 				C5BC20E9E4A08EC533D1D9E5 /* KeyDetailView.swift in Sources */,
 				61A4EAA19880ACE99CFE0742 /* KeyListView.swift in Sources */,
+				08B7523DB63B23ACEC927360 /* LocaleFilterPopover.swift in Sources */,
 				D57D11271309BAA33CF8E7C0 /* LocusApp.swift in Sources */,
 				C523F8C8C416F34C89FBE2E2 /* ProjectPersistence.swift in Sources */,
 				6392A75DA8F6E984C81F9A74 /* ProjectViewModel.swift in Sources */,
@@ -297,6 +307,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/Lib",
 				);
+				INFOPLIST_FILE = Sources/App/Info.plist;
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSHighResolutionCapable = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -394,6 +405,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/Lib",
 				);
+				INFOPLIST_FILE = Sources/App/Info.plist;
 				INFOPLIST_KEY_LSMinimumSystemVersion = 14.0;
 				INFOPLIST_KEY_NSHighResolutionCapable = YES;
 				LD_RUNPATH_SEARCH_PATHS = (

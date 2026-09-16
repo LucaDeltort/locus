@@ -2,28 +2,30 @@ import SwiftUI
 
 /// Right panel: edit all locale values for a single key.
 ///
-/// Each TextField writes directly to the Rust model via the ViewModel
-/// callback — no local edit buffer, no per-row save button.
+/// The source language row is shown first with a "base" badge.
+/// Copy-from-source uses the source language value, not the first
+/// alphabetically.
 struct KeyDetailView: View {
     let key: KeyRow
     let fileName: String
-    let onSetValue: (String, String) -> Void  // (lang, value)
+    let sourceLanguage: String
+    let displayedLocales: [String]
+    let onSetValue: (String, String, Bool) -> Void  // (lang, value, isCopy)
 
     @State private var showCopied = false
+    @State private var copiedLang: String?
 
-    /// Sorted locale list for stable display.
-    private var sortedLocales: [String] {
-        key.translations.keys.sorted()
-    }
-
-    /// First non-empty translation value, used as copy-from-source.
-    private var referenceValue: String? {
-        for lang in sortedLocales {
-            if let val = key.translations[lang], let v = val, !v.isEmpty {
-                return v
-            }
+    /// Source language value, used for copy-from-source.
+    private var sourceValue: String? {
+        if let val = key.translations[sourceLanguage], let v = val, !v.isEmpty {
+            return v
         }
         return nil
+    }
+
+    /// Other locales to display, excluding the source language.
+    private var otherLocales: [String] {
+        displayedLocales.filter { $0 != sourceLanguage }
     }
 
     var body: some View {
@@ -31,14 +33,16 @@ struct KeyDetailView: View {
             VStack(alignment: .leading, spacing: 16) {
                 header
                 Divider()
-                ForEach(sortedLocales, id: \.self) { lang in
-                    localeRow(lang)
+
+                // Source language row first
+                if key.translations[sourceLanguage] != nil {
+                    localeRow(sourceLanguage, isBase: true)
+                    Divider().opacity(0.5)
                 }
-                if showCopied {
-                    Text("Value copied to clipboard.")
-                        .font(.caption)
-                        .foregroundStyle(LocusTheme.violet)
-                        .transition(.opacity)
+
+                // Other locales
+                ForEach(otherLocales, id: \.self) { lang in
+                    localeRow(lang, isBase: false)
                 }
             }
             .padding(20)
@@ -69,39 +73,61 @@ struct KeyDetailView: View {
     // MARK: - Locale row
 
     @ViewBuilder
-    private func localeRow(_ lang: String) -> some View {
-        let currentValue = key.translations[lang] ?? nil
+    private func localeRow(_ lang: String, isBase: Bool) -> some View {
+        let currentValue = key.translations[lang].flatMap { $0 }
         let isMissing = key.missingLocales.contains(lang)
 
         HStack(alignment: .top, spacing: 12) {
-            Text(lang)
-                .font(.system(.body, design: .monospaced))
-                .frame(width: 50, alignment: .leading)
-                .foregroundStyle(isMissing ? .orange : .secondary)
+            // Locale badge
+            HStack(spacing: 4) {
+                Text(lang)
+                    .font(.system(.body, design: .monospaced))
+                if isBase {
+                    Text("base")
+                        .font(.system(size: 9, design: .monospaced))
+                        .foregroundStyle(LocusTheme.violet)
+                        .padding(.horizontal, 4)
+                        .padding(.vertical, 1)
+                        .background(LocusTheme.violet.opacity(0.15))
+                        .clipShape(RoundedRectangle(cornerRadius: 3))
+                }
+            }
+            .frame(width: 80, alignment: .leading)
+            .foregroundStyle(isMissing ? .orange : .secondary)
 
+            // Editable value
             TextField(
                 "Missing…",
                 text: Binding(
                     get: { currentValue ?? "" },
-                    set: { newVal in onSetValue(lang, newVal) }
+                    set: { newVal in onSetValue(lang, newVal, false) }
                 )
             )
             .textFieldStyle(.roundedBorder)
 
-            if isMissing, let refVal = referenceValue {
+            // Copy feedback (briefly visible after copy)
+            if copiedLang == lang {
+                Image(systemName: "checkmark")
+                    .foregroundStyle(LocusTheme.violet)
+                    .transition(.opacity)
+            }
+
+            // Copy-from-source button (always visible on non-base rows
+            // when a source value exists, even after filling).
+            if !isBase, let refVal = sourceValue {
                 Button {
                     #if canImport(AppKit)
                     NSPasteboard.general.clearContents()
                     NSPasteboard.general.setString(refVal, forType: .string)
                     #endif
-                    onSetValue(lang, refVal)
-                    withAnimation { showCopied = true }
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                        withAnimation { showCopied = false }
+                    onSetValue(lang, refVal, true)
+                    withAnimation { copiedLang = lang }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
+                        withAnimation { copiedLang = nil }
                     }
                 } label: {
                     Image(systemName: "doc.on.clipboard")
-                        .help("Copy from source")
+                        .help("Copy from \(sourceLanguage)")
                 }
                 .buttonStyle(.borderless)
             }

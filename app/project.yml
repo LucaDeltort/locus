@@ -39,6 +39,7 @@ targets:
         ENABLE_USER_SCRIPT_SANDBOXING: NO
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: Sources/App/Info.plist
         INFOPLIST_KEY_LSMinimumSystemVersion: "14.0"
         INFOPLIST_KEY_NSHighResolutionCapable: YES
     preBuildScripts:
@@ -64,6 +65,14 @@ targets:
         inputFiles:
           - "$(SRCROOT)/../crates/core/src/lib.rs"
           - "$(SRCROOT)/../crates/core/src/ffi.rs"
+          - "$(SRCROOT)/../crates/core/src/edit.rs"
+          - "$(SRCROOT)/../crates/core/src/model.rs"
+          - "$(SRCROOT)/../crates/core/src/parser.rs"
+          - "$(SRCROOT)/../crates/core/src/xcstrings.rs"
+          - "$(SRCROOT)/../crates/core/src/project.rs"
+          - "$(SRCROOT)/../crates/core/src/search.rs"
+          - "$(SRCROOT)/../crates/core/src/missing.rs"
+          - "$(SRCROOT)/../crates/core/src/save.rs"
           - "$(SRCROOT)/../Cargo.toml"
         outputFiles:
           - "$(SRCROOT)/Lib/liblocus_core.a"

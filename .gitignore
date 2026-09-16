@@ -23,3 +23,6 @@ app/Lib/
 
 # Generated Swift bindings (intermediate, copied to app/Sources/Generated/)
 /generated/
+
+# Xcode build output
+app/build/

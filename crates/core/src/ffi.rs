@@ -18,6 +18,8 @@ pub enum LocusError {
     FileNotFound { name: String },
     /// A key already exists when trying to add it.
     KeyAlreadyExists { key: String },
+    /// A key was not found when trying to delete it.
+    KeyNotFound { key: String },
     /// An IO error occurred during scanning or saving.
     Io { message: String },
     /// A parse error in a `.xcstrings` file.
@@ -30,6 +32,7 @@ impl std::fmt::Display for LocusError {
             LocusError::NotFound { path } => write!(f, "Path not found: {path}"),
             LocusError::FileNotFound { name } => write!(f, "File not found: {name}"),
             LocusError::KeyAlreadyExists { key } => write!(f, "Key already exists: {key}"),
+            LocusError::KeyNotFound { key } => write!(f, "Key not found: {key}"),
             LocusError::Io { message } => write!(f, "IO error: {message}"),
             LocusError::Parse { message } => write!(f, "Parse error: {message}"),
         }
@@ -51,6 +54,7 @@ impl From<edit::EditError> for LocusError {
         match e {
             edit::EditError::FileNotFound(n) => LocusError::FileNotFound { name: n },
             edit::EditError::KeyAlreadyExists(k) => LocusError::KeyAlreadyExists { key: k },
+            edit::EditError::KeyNotFound(k) => LocusError::KeyNotFound { key: k },
         }
     }
 }
@@ -252,6 +256,13 @@ impl LocusProject {
     ) -> Result<(), LocusError> {
         let mut proj = self.inner.lock().unwrap();
         edit::add_key(&mut proj, file, key, base_lang, base_value)?;
+        Ok(())
+    }
+
+    /// Delete a key from all locales of a file.
+    pub fn delete_key(&self, file: &str, key: &str) -> Result<(), LocusError> {
+        let mut proj = self.inner.lock().unwrap();
+        edit::delete_key(&mut proj, file, key)?;
         Ok(())
     }
 
