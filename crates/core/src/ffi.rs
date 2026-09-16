@@ -43,7 +43,9 @@ impl From<project::ScanError> for LocusError {
     fn from(e: project::ScanError) -> Self {
         match e {
             project::ScanError::NotFound(p) => LocusError::NotFound { path: p },
-            project::ScanError::Io(e) => LocusError::Io { message: format!("{e}") },
+            project::ScanError::Io(e) => LocusError::Io {
+                message: format!("{e}"),
+            },
             project::ScanError::Parse(m) => LocusError::Parse { message: m },
         }
     }
@@ -62,7 +64,9 @@ impl From<edit::EditError> for LocusError {
 impl From<save::SaveError> for LocusError {
     fn from(e: save::SaveError) -> Self {
         match e {
-            save::SaveError::Io(e) => LocusError::Io { message: format!("{e}") },
+            save::SaveError::Io(e) => LocusError::Io {
+                message: format!("{e}"),
+            },
         }
     }
 }

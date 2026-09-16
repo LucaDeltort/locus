@@ -42,7 +42,11 @@ pub fn add_key(
         key.to_string(),
         Key {
             key: key.to_string(),
-            value: if base_value.is_empty() { None } else { Some(base_value.to_string()) },
+            value: if base_value.is_empty() {
+                None
+            } else {
+                Some(base_value.to_string())
+            },
             comment: None,
             state: crate::model::KeyState::Translated,
             extraction_state: None,
@@ -80,17 +84,26 @@ pub fn set_value(
     // Update the value in-place when the key already exists, preserving
     // metadata (comment, extraction_state) that would otherwise be lost.
     // For new keys, insert with sensible defaults.
-    strings_file.keys
+    strings_file
+        .keys
         .entry(key.to_string())
         .and_modify(|k| {
-            k.value = if value.is_empty() { None } else { Some(value.to_string()) };
+            k.value = if value.is_empty() {
+                None
+            } else {
+                Some(value.to_string())
+            };
             // Marking as translated since we just set a concrete value.
             k.state = crate::model::KeyState::Translated;
         })
         .or_insert_with(|| Key {
             key: key.to_string(),
             // Empty string = no value (treated as missing by the UI).
-            value: if value.is_empty() { None } else { Some(value.to_string()) },
+            value: if value.is_empty() {
+                None
+            } else {
+                Some(value.to_string())
+            },
             comment: None,
             state: crate::model::KeyState::Translated,
             extraction_state: None,
@@ -349,7 +362,7 @@ mod tests {
 
         assert_eq!(k.value.as_deref(), Some("Updated"));
         assert_eq!(k.comment.as_deref(), Some("Important comment")); // preserved!
-        assert_eq!(k.extraction_state.as_deref(), Some("manual"));   // preserved!
+        assert_eq!(k.extraction_state.as_deref(), Some("manual")); // preserved!
         assert_eq!(k.state, KeyState::Translated); // updated, as expected
     }
 }
