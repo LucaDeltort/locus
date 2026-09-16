@@ -18,6 +18,7 @@ pub fn run(
     edit::add_key(&mut proj, &file, key, lang, value).map_err(|e| match e {
         edit::EditError::FileNotFound(f) => format!("file '{}' not found", f),
         edit::EditError::KeyAlreadyExists(k) => format!("key '{}' already exists in '{}'", k, file),
+        edit::EditError::KeyNotFound(k) => format!("key '{}' not found in '{}'", k, file),
     })?;
 
     locus_core::save::save_project(&proj, backup).map_err(|e| format!("{:?}", e))?;

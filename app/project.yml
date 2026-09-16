@@ -1,0 +1,81 @@
+name: Locus
+options:
+  bundleIdPrefix: com.lucaDeltort
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+
+targets:
+  Locus:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources/App
+      - path: Sources/Views
+      - path: Sources/Models
+      - path: Sources/Theme
+      - path: Sources/Generated
+      - path: AppIcons/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.lucaDeltort.locus
+        PRODUCT_NAME: Locus
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_INCLUDE_PATHS:
+          - "$(SRCROOT)/Lib"
+        OTHER_SWIFT_FLAGS:
+          - "-Xcc"
+          - "-fmodule-map-file=$(SRCROOT)/Lib/locusFFI.modulemap"
+        OTHER_LDFLAGS:
+          - "$(SRCROOT)/Lib/liblocus_core.a"
+        HEADER_SEARCH_PATHS:
+          - "$(SRCROOT)/Lib"
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: NO
+        INFOPLIST_FILE: Sources/App/Info.plist
+        INFOPLIST_KEY_LSMinimumSystemVersion: "14.0"
+        INFOPLIST_KEY_NSHighResolutionCapable: YES
+    preBuildScripts:
+      - script: |
+          # Build Rust core + generate Swift bindings before Xcode compiles Swift.
+          cd "$PROJECT_DIR/.."
+
+          echo "▸ Building locus-core (release)…"
+          cargo build -p locus-core --release
+
+          echo "▸ Generating Swift bindings…"
+          cargo run -p locus-bindgen
+
+          echo "▸ Copying artifacts to app/…"
+          mkdir -p app/Lib app/Sources/Generated
+          cp target/release/liblocus_core.a app/Lib/
+          cp generated/swift/locus.swift app/Sources/Generated/
+          cp generated/swift/locusFFI.h app/Lib/
+          cp generated/swift/locusFFI.modulemap app/Lib/
+
+          echo "✓ Rust core ready."
+        name: Build Rust Core
+        inputFiles:
+          - "$(SRCROOT)/../crates/core/src/lib.rs"
+          - "$(SRCROOT)/../crates/core/src/ffi.rs"
+          - "$(SRCROOT)/../crates/core/src/edit.rs"
+          - "$(SRCROOT)/../crates/core/src/model.rs"
+          - "$(SRCROOT)/../crates/core/src/parser.rs"
+          - "$(SRCROOT)/../crates/core/src/xcstrings.rs"
+          - "$(SRCROOT)/../crates/core/src/project.rs"
+          - "$(SRCROOT)/../crates/core/src/search.rs"
+          - "$(SRCROOT)/../crates/core/src/missing.rs"
+          - "$(SRCROOT)/../crates/core/src/save.rs"
+          - "$(SRCROOT)/../Cargo.toml"
+        outputFiles:
+          - "$(SRCROOT)/Lib/liblocus_core.a"
+          - "$(SRCROOT)/Sources/Generated/locus.swift"
+          - "$(SRCROOT)/Lib/locusFFI.h"
+          - "$(SRCROOT)/Lib/locusFFI.modulemap"

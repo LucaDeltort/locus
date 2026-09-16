@@ -42,7 +42,11 @@ pub fn add_key(
         key.to_string(),
         Key {
             key: key.to_string(),
-            value: Some(base_value.to_string()),
+            value: if base_value.is_empty() {
+                None
+            } else {
+                Some(base_value.to_string())
+            },
             comment: None,
             state: crate::model::KeyState::Translated,
             extraction_state: None,
@@ -77,16 +81,56 @@ pub fn set_value(
             keys: IndexMap::new(),
         });
 
-    strings_file.keys.insert(
-        key.to_string(),
-        Key {
+    // Update the value in-place when the key already exists, preserving
+    // metadata (comment, extraction_state) that would otherwise be lost.
+    // For new keys, insert with sensible defaults.
+    strings_file
+        .keys
+        .entry(key.to_string())
+        .and_modify(|k| {
+            k.value = if value.is_empty() {
+                None
+            } else {
+                Some(value.to_string())
+            };
+            // Marking as translated since we just set a concrete value.
+            k.state = crate::model::KeyState::Translated;
+        })
+        .or_insert_with(|| Key {
             key: key.to_string(),
-            value: Some(value.to_string()),
+            // Empty string = no value (treated as missing by the UI).
+            value: if value.is_empty() {
+                None
+            } else {
+                Some(value.to_string())
+            },
             comment: None,
             state: crate::model::KeyState::Translated,
             extraction_state: None,
-        },
-    );
+        });
+
+    Ok(())
+}
+
+/// Remove a key from all locales of a file.
+///
+/// Returns `KeyNotFound` if the key doesn't exist in any locale.
+pub fn delete_key(project: &mut Project, file: &str, key: &str) -> Result<(), EditError> {
+    let localization_file = project
+        .files
+        .get_mut(file)
+        .ok_or_else(|| EditError::FileNotFound(file.to_string()))?;
+
+    let mut removed = false;
+    for sf in localization_file.locales.values_mut() {
+        if sf.keys.shift_remove(key).is_some() {
+            removed = true;
+        }
+    }
+
+    if !removed {
+        return Err(EditError::KeyNotFound(key.to_string()));
+    }
 
     Ok(())
 }
@@ -95,6 +139,7 @@ pub fn set_value(
 pub enum EditError {
     FileNotFound(String),
     KeyAlreadyExists(String),
+    KeyNotFound(String),
 }
 
 // --- Tests ---
@@ -261,5 +306,63 @@ mod tests {
                 .as_deref(),
             Some("New Value")
         );
+    }
+
+    #[test]
+    fn set_value_preserves_comment_and_extraction_state() {
+        use crate::model::{FileFormat, KeyState, LocalizationFile};
+        let mut project = test_helpers::empty_project();
+
+        // Simulate a key that already has a comment and extraction_state
+        // (as would come from parsing a real .xcstrings file).
+        let mut keys = IndexMap::new();
+        keys.insert(
+            "existing".to_string(),
+            Key {
+                key: "existing".into(),
+                value: Some("Old".into()),
+                comment: Some("Important comment".into()),
+                state: KeyState::New,
+                extraction_state: Some("manual".into()),
+            },
+        );
+        project.files.insert(
+            "Localizable".to_string(),
+            LocalizationFile {
+                name: "Localizable".into(),
+                locales: {
+                    let mut m = HashMap::new();
+                    m.insert(
+                        "en".to_string(),
+                        crate::model::StringsFile {
+                            lang: "en".into(),
+                            path: PathBuf::from("t.xcstrings"),
+                            keys,
+                        },
+                    );
+                    m
+                },
+                format: FileFormat::XcStrings,
+                path: PathBuf::from("t.xcstrings"),
+                source_language: "en".into(),
+            },
+        );
+
+        set_value(&mut project, "Localizable", "existing", "en", "Updated").unwrap();
+        let k = project
+            .files
+            .get("Localizable")
+            .unwrap()
+            .locales
+            .get("en")
+            .unwrap()
+            .keys
+            .get("existing")
+            .unwrap();
+
+        assert_eq!(k.value.as_deref(), Some("Updated"));
+        assert_eq!(k.comment.as_deref(), Some("Important comment")); // preserved!
+        assert_eq!(k.extraction_state.as_deref(), Some("manual")); // preserved!
+        assert_eq!(k.state, KeyState::Translated); // updated, as expected
     }
 }

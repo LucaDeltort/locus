@@ -1,0 +1,5 @@
+[build]
+# Target macOS 14 (Sonoma) to match the Xcode deployment target.
+# Without this, the Rust standard library is compiled for the host
+# macOS version, causing linker warnings in Xcode.
+rustflags = ["-C", "link-arg=-mmacosx-version-min=14.0"]

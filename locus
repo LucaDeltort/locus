@@ -1,0 +1,55 @@
+#!/bin/bash
+# locus — CLI launcher for the Locus macOS app.
+#
+# Usage:
+#   locus /path/to/project          # Open a project folder or .xcstrings file
+#   locus                            # Open with last-used project (if any)
+#
+# Install (from the project root):
+#   ln -s "$(pwd)/locus" /usr/local/bin/locus
+#
+# Uninstall:
+#   rm /usr/local/bin/locus
+
+set -euo pipefail
+
+# Resolve symlinks to find the real script location.
+SCRIPT_PATH="$0"
+while [[ -L "$SCRIPT_PATH" ]]; do
+    SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+    SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+    [[ "$SCRIPT_PATH" != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
+SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
+# Find the .app: either in app/Locus.app (pre-built)
+# or in Xcode's DerivedData (prefer Release, fall back to Debug).
+APP_PATH=""
+if [[ -d "$SCRIPT_DIR/app/Locus.app" ]]; then
+    APP_PATH="$SCRIPT_DIR/app/Locus.app"
+elif [[ -d "$SCRIPT_DIR/app/Locus.xcodeproj" ]]; then
+    # Prefer Release build; fall back to any available build.
+    APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/Locus-* \
+        -name Locus.app -path "*/Build/Products/Release/*" \
+        -not -path "*/Index.noindex/*" -type d 2>/dev/null | head -1)
+    if [[ -z "$APP_PATH" ]]; then
+        APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData/Locus-* \
+            -name Locus.app -path "*/Build/Products/Debug/*" \
+            -not -path "*/Index.noindex/*" -type d 2>/dev/null | head -1)
+    fi
+fi
+
+if [[ -z "$APP_PATH" || ! -d "$APP_PATH" ]]; then
+    echo "Error: Locus.app not found."
+    echo "Build it first with: cd app && xcodegen generate && xcodebuild -project Locus.xcodeproj build"
+    exit 1
+fi
+
+if [[ $# -gt 0 ]]; then
+    # Resolve to absolute path and let macOS open it as a file with the app.
+    # This triggers .onOpenURL in the SwiftUI app.
+    TARGET="$(cd "$(dirname "$1")" && pwd)/$(basename "$1")"
+    open -a "$APP_PATH" "$TARGET"
+else
+    open -a "$APP_PATH"
+fi
