@@ -23,6 +23,10 @@ app/Lib/
 
 # Generated Swift bindings (intermediate, copied to app/Sources/Generated/)
 /generated/
+app/Sources/Generated/
+
+# Built app bundle (rebuilt by Xcode from sources)
+app/Locus.app/
 
 # Xcode build output
 app/build/

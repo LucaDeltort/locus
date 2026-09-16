@@ -154,10 +154,22 @@ final class ProjectViewModel {
     /// Consecutive edits to the same field are grouped into one entry.
     private var undoStack: [(file: String, key: String, lang: String, originalValue: String?)] = []
 
+    /// Maximum number of undo entries retained. Older entries are evicted
+    /// once the cap is reached (FIFO), bounding memory on long editing sessions.
+    private let maxUndoEntries = 50
+
     /// Tracks the last field edited, for grouping consecutive keystrokes.
     private var lastEditedField: (file: String, key: String, lang: String)?
 
     var canUndo: Bool { !undoStack.isEmpty }
+
+    /// Push an entry onto the undo stack, evicting the oldest if over cap.
+    private func pushUndo(_ entry: (file: String, key: String, lang: String, originalValue: String?)) {
+        undoStack.append(entry)
+        if undoStack.count > maxUndoEntries {
+            undoStack.removeFirst(undoStack.count - maxUndoEntries)
+        }
+    }
 
     /// Undo the last edit.
     func undo() {
@@ -218,7 +230,7 @@ final class ProjectViewModel {
         } else {
             // New field (or copy): push the original value onto the undo stack.
             let oldValue = selectedKey?.translations[lang] ?? nil
-            undoStack.append((file: file, key: key, lang: lang, originalValue: oldValue))
+            pushUndo((file: file, key: key, lang: lang, originalValue: oldValue))
             lastEditedField = (file: file, key: key, lang: lang)
         }
 
@@ -257,7 +269,7 @@ final class ProjectViewModel {
         try project.addKey(file: file, key: key, baseLang: baseLang, baseValue: baseValue)
         unsavedChanges = true
         // Undo for addKey = delete the key.
-        undoStack.append((file: file, key: key, lang: "", originalValue: nil))
+        pushUndo((file: file, key: key, lang: "", originalValue: nil))
         lastEditedField = nil
         invalidateKeys()
         if let idx = filteredKeys.firstIndex(where: { $0.key == key }) {
